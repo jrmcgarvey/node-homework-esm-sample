@@ -1,5 +1,7 @@
 const notFound = async (req, res, next) => {
-    res.status(404).json({message: `There is no route for ${req.method} requests to ${req.path}`})
-}
+  res.status(404).json({
+    message: `There is no route for ${req.method} requests to ${req.path}`,
+  });
+};
 
-export default notFound
+export default notFound;

@@ -18,17 +18,21 @@ app.use(express.json());
 //   });
 // });
 
-global.tasks = []
-global.users = []
+global.tasks = [];
+global.users = [];
 global.user_id = null;
 
-import userRouter from './routes/userRoutes.js'
-import notFound from './middleware/not-found.js'
-import errorHandler from './middleware/error-handler.js'
+import authMiddleware from "./middleware/auth.js";
+import taskRouter from "./routes/taskRoutes.js";
 
-app.use('/api', userRouter)
-app.use(notFound)
-app.use(errorHandler)
+app.use("/api/tasks", authMiddleware, taskRouter);
+import userRouter from "./routes/userRoutes.js";
+import notFound from "./middleware/not-found.js";
+import errorHandler from"./middleware/error-handler.js";
+
+app.use("/api/users", userRouter);
+app.use(notFound);
+app.use(errorHandler);
 
 const port = process.env.PORT || 3000;
 
