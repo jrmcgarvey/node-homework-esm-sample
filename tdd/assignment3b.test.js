@@ -2,14 +2,14 @@ import request from "supertest";
 import app from "../week-3-middleware/app.js";
 import fs from "fs";
 import path from "path";
-import { describe, expect, beforeAll, afterAll, test, spyOn } from "vitest";
+import { describe, expect, beforeAll, afterAll, test, vi } from "vitest";
 
 let logSpy;
 let errorSpy;
 
 beforeAll(() => {
-  logSpy = spyOn(console, "log").mockImplementation(() => {});
-  errorSpy = spyOn(console, "error").mockImplementation(() => {});
+  logSpy = vi.spyOn(console, "log").mockImplementation(() => {});
+  errorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
 });
 
 afterAll(() => {

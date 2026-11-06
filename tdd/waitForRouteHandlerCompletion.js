@@ -1,9 +1,9 @@
-import { fn } from "vitest";
+import { vi } from "vitest";
 
 const waitForRouteHandlerCompletion = async (func, req, res) => {
   let next;
   const promise = new Promise((resolve, reject) => {
-    next = fn((err) => {
+    next = vi.fn((err) => {
       if (err) return reject(err);
       resolve();
     });

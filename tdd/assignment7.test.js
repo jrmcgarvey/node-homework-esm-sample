@@ -19,7 +19,7 @@ import {
 } from "../controllers/analyticsController.js";
 import errorHandlerMiddleware from "../middleware/error-handler.js";
 /* eslint-enable n/no-missing-import */
-import { describe, it, expect, beforeAll, afterAll, fn } from "vitest";
+import { describe, it, expect, beforeAll, afterAll, vi } from "vitest";
 
 let user1 = null;
 let user2 = null;
@@ -310,7 +310,7 @@ describe("testing bulk task operations", () => {
       },
     });
     saveRes = httpMocks.createResponse();
-    const next = fn((err) => {
+    const next = vi.fn((err) => {
       if (err) {
         errorHandlerMiddleware(err, req, saveRes, () => {});
       }

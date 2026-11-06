@@ -1,13 +1,13 @@
 import request from "supertest";
 import app from "../week-3-middleware/app.js";
-import { describe, expect, beforeAll, afterAll, test, spyOn } from "vitest";
+import { describe, expect, beforeAll, afterAll, test, vi } from "vitest";
 
 let errorSpy;
 let warnSpy;
 
 beforeAll(() => {
-  errorSpy = spyOn(console, "error").mockImplementation(() => {});
-  warnSpy = spyOn(console, "warn").mockImplementation(() => {});
+  errorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+  warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
 });
 
 afterAll(() => {

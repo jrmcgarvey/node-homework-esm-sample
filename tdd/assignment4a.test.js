@@ -12,7 +12,7 @@ import {
 /* eslint-enable n/no-missing-import */
 // eslint-disable-next-line n/no-missing-import -- created by student in this assignment
 import { logon, register, logoff } from "../controllers/userController.js";
-import { describe, it, expect, fn } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 
 global.users = [];
 global.tasks = [];
@@ -30,7 +30,7 @@ describe("Assignment 4a: Protected Task Routes", () => {
       global.user_id = null;
       const req = httpMocks.createRequest({ method: "GET" });
       const res = httpMocks.createResponse();
-      const next = fn();
+      const next = vi.fn();
 
       authMiddleware(req, res, next);
 
@@ -42,7 +42,7 @@ describe("Assignment 4a: Protected Task Routes", () => {
       global.user_id = { email: "jim@sample.com", name: "Jim" };
       const req = httpMocks.createRequest({ method: "GET" });
       const res = httpMocks.createResponse();
-      const next = fn();
+      const next = vi.fn();
 
       authMiddleware(req, res, next);
 

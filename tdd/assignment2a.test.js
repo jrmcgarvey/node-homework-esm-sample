@@ -3,7 +3,7 @@ import fs from "fs";
 import http from "http";
 import { spawn } from "child_process";
 import request from "supertest";
-import { describe, expect, beforeAll, afterAll, test, spyOn } from "vitest";
+import { describe, expect, beforeAll, afterAll, test, vi } from "vitest";
 
 describe("Assignment 2a: Core Events, HTTP, and Express", () => {
   const assignmentDir = path.join(import.meta.dirname, "../assignment2");
@@ -92,7 +92,7 @@ describe("Assignment 2a: Core Events, HTTP, and Express", () => {
       expect(typeof emitter.emit).toBe("function");
       expect(emitter.listenerCount("time")).toBe(1);
 
-      const logSpy = spyOn(console, "log").mockImplementation(() => {});
+      const logSpy = vi.spyOn(console, "log").mockImplementation(() => {});
       emitter.emit("time", "test time");
       expect(logSpy).toHaveBeenCalledWith("Time received:", "test time");
       logSpy.mockRestore();
