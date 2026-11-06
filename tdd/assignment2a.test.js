@@ -88,7 +88,7 @@ describe("Assignment 2a: Core Events, HTTP, and Express", () => {
       const eventsPath = path.join(assignmentDir, "events.js");
       expect(fs.existsSync(eventsPath)).toBe(true);
 
-      const emitter = await import(eventsPath);
+      const { default: emitter } = await import(eventsPath);
       expect(typeof emitter.emit).toBe("function");
       expect(emitter.listenerCount("time")).toBe(1);
 

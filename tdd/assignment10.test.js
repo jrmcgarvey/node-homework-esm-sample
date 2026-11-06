@@ -378,7 +378,7 @@ let taskSchema = null;
 let patchTaskSchema = null;
 try {
 /* eslint-disable n/no-missing-import -- created by student in this assignment */
-  ({ userSchema } = await import("../validation/userSchema.js"));
+  ({ default: userSchema } = await import("../validation/userSchema.js"));
   ({ taskSchema, patchTaskSchema } =
     await import("../validation/taskSchema.js"));
 /* eslint-enable n/no-missing-import -- created by student in this assignment */
