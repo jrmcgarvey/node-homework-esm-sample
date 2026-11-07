@@ -9,6 +9,7 @@ function echoBody(req, res) {
     weReceived: req.body,
   });
 }
+
 export {
   getTime,
   echoBody,

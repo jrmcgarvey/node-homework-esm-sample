@@ -1,10 +1,11 @@
+import "./setenv.js"
 import express from "express";
 
 const app = express();
 
 app.use(express.json());
 
-// const timeRouter = require("./routes/timeRoutes");
+// const timeRouter from "./routes/timeRoutes");
 
 // app.use("/api", timeRouter);
 
@@ -17,9 +18,10 @@ app.use(express.json());
 //     message: "POST route works",
 //   });
 // });
+import pool from "./db/pg-pool.js ";
 
-global.tasks = [];
-global.users = [];
+// global.tasks = [];
+// global.users = [];
 global.user_id = null;
 
 import authMiddleware from "./middleware/auth.js";
@@ -28,9 +30,19 @@ import taskRouter from "./routes/taskRoutes.js";
 app.use("/api/tasks", authMiddleware, taskRouter);
 import userRouter from "./routes/userRoutes.js";
 import notFound from "./middleware/not-found.js";
-import errorHandler from"./middleware/error-handler.js";
+import errorHandler from "./middleware/error-handler.js";
 
 app.use("/api/users", userRouter);
+app.get("/health", async (_req, res) => {
+  try {
+    await pool.query("SELECT 1");
+    res.json({ status: "ok", db: "connected" });
+  } catch (err) {
+    res
+      .status(500)
+      .json({ message: `db not connected, error: ${err.message}` });
+  }
+});
 app.use(notFound);
 app.use(errorHandler);
 
@@ -38,6 +50,36 @@ const port = process.env.PORT || 3000;
 
 const server = app.listen(port, () => {
   console.log(`Server is listening on port ${port}...`);
+});
+
+let isShuttingDown = false;
+async function shutdown(code = 0) {
+  if (isShuttingDown) return;
+  isShuttingDown = true;
+  console.log("Shutting down gracefully...");
+  try {
+    await new Promise((resolve) => server.close(resolve));
+    console.log("HTTP server closed.");
+    await pool.end();
+    // If you have DB connections, close them here
+  } catch (err) {
+    console.error("Error during shutdown:", err);
+    code = 1;
+  } finally {
+    console.log("Exiting process...");
+    process.exit(code);
+  }
+}
+
+process.on("SIGINT", () => shutdown(0)); // ctrl+c
+process.on("SIGTERM", () => shutdown(0)); // e.g. `docker stop`
+process.on("uncaughtException", (err) => {
+  console.error("Uncaught exception:", err);
+  shutdown(1);
+});
+process.on("unhandledRejection", (reason) => {
+  console.error("Unhandled rejection:", reason);
+  shutdown(1);
 });
 
 export { app, server };
