@@ -1,6 +1,6 @@
 import "../setenvtest.js";
 // eslint-disable-next-line n/no-missing-import -- created by student in this assignment
-import pool from "../db/pool.js";
+import pool from "../db/pg-pool.js";
 import httpMocks from "node-mocks-http";
 /* eslint-disable n/no-missing-import -- created by student in this assignment */
 import {
