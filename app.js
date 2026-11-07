@@ -1,4 +1,3 @@
-import "./setenv.js"
 import express from "express";
 
 const app = express();
@@ -18,7 +17,8 @@ app.use(express.json());
 //     message: "POST route works",
 //   });
 // });
-import pool from "./db/pg-pool.js ";
+// const pool from "./db/pg-pool");
+import prisma from "./db/prisma.js";
 
 // global.tasks = [];
 // global.users = [];
@@ -35,7 +35,8 @@ import errorHandler from "./middleware/error-handler.js";
 app.use("/api/users", userRouter);
 app.get("/health", async (_req, res) => {
   try {
-    await pool.query("SELECT 1");
+    // await pool.query("SELECT 1");
+    await prisma.$queryRaw`SELECT 1`;
     res.json({ status: "ok", db: "connected" });
   } catch (err) {
     res
@@ -60,8 +61,10 @@ async function shutdown(code = 0) {
   try {
     await new Promise((resolve) => server.close(resolve));
     console.log("HTTP server closed.");
-    await pool.end();
+    // await pool.end();
     // If you have DB connections, close them here
+    await prisma.$disconnect();
+    console.log("Prisma disconnected");
   } catch (err) {
     console.error("Error during shutdown:", err);
     code = 1;
