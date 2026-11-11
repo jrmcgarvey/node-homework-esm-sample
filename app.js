@@ -29,6 +29,8 @@ import taskRouter from "./routes/taskRoutes.js";
 
 app.use("/api/tasks", authMiddleware, taskRouter);
 import userRouter from "./routes/userRoutes.js";
+import anaRouter from "./routes/analyticsRoutes.js";
+app.use("/api/analytics", authMiddleware, anaRouter);
 import notFound from "./middleware/not-found.js";
 import errorHandler from "./middleware/error-handler.js";
 

@@ -1,11 +1,13 @@
-generator client {
-  provider = "prisma-client"
-  output   = "../generated/prisma"
-  importFileExtension = "ts"
-}
+// This is your Prisma schema file
+// Learn more at https://pris.ly/d/prisma-schema
 
 datasource db {
   provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
 }
 
 model User {
@@ -22,6 +24,7 @@ model Task {
   id           Int      @id @default(autoincrement())
   title        String   @db.VarChar(255)
   isCompleted Boolean  @default(false) @map("is_completed")
+  priority    String   @default("medium") @db.VarChar(10) // Add this line
   userId      Int       @map("user_id")
   createdAt   DateTime @default(now()) @db.Timestamp(6) @map("created_at")
   user        User    @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
