@@ -9,8 +9,4 @@ function echoBody(req, res) {
     weReceived: req.body,
   });
 }
-
-module.exports = {
-  getTime,
-  echoBody,
-};
+export { getTime, echoBody };
