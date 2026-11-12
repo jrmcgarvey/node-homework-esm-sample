@@ -1,8 +1,8 @@
-const express = require("express");
-const anaController = require("../controllers/analyticsController");
+import express from "express";
+import anaController from "../controllers/analyticsController.js";
 const router = express.Router();
 
 router.get("/users", anaController.getUsersWithStats);
 router.get("/users/:id", anaController.getUserAnalytics);
 router.get("/tasks/search", anaController.searchTasks);
-module.exports = router;
+export default router;

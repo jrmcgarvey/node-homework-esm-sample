@@ -63,7 +63,7 @@ const index = async (req, res) => {
       isCompleted: true,
       priority: true,
       createdAt: true,
-      User: {
+      user: {
         select: {
           name: true,
           email: true,
@@ -113,7 +113,7 @@ const show = async (req, res) => {
       isCompleted: true,
       priority: true,
       createdAt: true,
-      User: {
+      user: {
         select: {
           name: true,
           email: true,

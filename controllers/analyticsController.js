@@ -36,7 +36,7 @@ const getUserAnalytics = async (req, res) => {
       priority: true,
       createdAt: true,
       userId: true,
-      User: {
+      user: {
         select: { name: true },
       },
     },
@@ -82,14 +82,14 @@ const getUsersWithStats = async (req, res) => {
   // Note: In Prisma, you need to use include for relations, then transform the result
   const usersRaw = await prisma.user.findMany({
     include: {
-      Task: {
+      tasks: {
         where: { isCompleted: false },
         select: { id: true },
         take: 5,
       },
       _count: {
         select: {
-          Task: true,
+          tasks: true,
         },
       },
     },

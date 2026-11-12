@@ -10,7 +10,4 @@ function echoBody(req, res) {
   });
 }
 
-export {
-  getTime,
-  echoBody,
-};
+export { getTime, echoBody };
