@@ -227,9 +227,9 @@ describe("getting created tasks with eager loading and pagination", () => {
 
   it("The tasks array includes user information from eager loading.", () => {
     if (saveData.tasks.length > 0) {
-      expect(saveData.tasks[0]).toHaveProperty("User");
-      expect(saveData.tasks[0].User).toHaveProperty("name");
-      expect(saveData.tasks[0].User).toHaveProperty("email");
+      expect(saveData.tasks[0]).toHaveProperty("user");
+      expect(saveData.tasks[0].user).toHaveProperty("name");
+      expect(saveData.tasks[0].user).toHaveProperty("email");
     }
   });
 
@@ -276,8 +276,8 @@ describe("getting created tasks with eager loading and pagination", () => {
     await show(req, saveRes, () => {});
     expect(saveRes.statusCode).toBe(200);
     saveData = saveRes._getJSONData();
-    expect(saveData).toHaveProperty("User");
-    expect(saveData.User).toHaveProperty("name");
+    expect(saveData).toHaveProperty("user");
+    expect(saveData.user).toHaveProperty("name");
   });
 });
 
@@ -357,7 +357,7 @@ describe("testing analytics endpoints", () => {
     expect(saveData).toHaveProperty("pagination");
     if (saveData.users.length > 0) {
       expect(saveData.users[0]).toHaveProperty("_count");
-      expect(saveData.users[0]._count).toHaveProperty("Task");
+      expect(saveData.users[0]._count).toHaveProperty("tasks");
     }
   });
 

@@ -1,0 +1,6 @@
+const serverError = async (err, _req, res, next) => {
+  res.status(500).json({ message: "A server error occurred" });
+  console.error("A server error occurred: ", err);
+};
+
+export default serverError;

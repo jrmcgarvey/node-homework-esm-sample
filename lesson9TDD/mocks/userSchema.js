@@ -6,4 +6,4 @@ const userSchema = Joi.object({
   password: Joi.any(),
 });
 
-export default { userSchema };
+export default userSchema;

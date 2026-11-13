@@ -2,7 +2,7 @@ import { vi } from "vitest";
 
 const waitForRouteHandlerCompletion = async (func, req, res) => {
   let next;
-  const promise = new Promise((resolve, reject) => {
+  const done = new Promise((resolve, reject) => {
     next = vi.fn((err) => {
       if (err) return reject(err);
       resolve();
@@ -11,8 +11,9 @@ const waitForRouteHandlerCompletion = async (func, req, res) => {
       resolve();
     });
   });
+  done.catch(() => {});
   await func(req, res, next);
-  await promise;
+  await done;
   return next;
 };
 export default waitForRouteHandlerCompletion;

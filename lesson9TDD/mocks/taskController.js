@@ -42,7 +42,7 @@ const getFields = (fields) => {
     const userSelect = Object.fromEntries(
       userFields.map((field) => [field, true]),
     );
-    taskSelect["User"] = { select: userSelect };
+    taskSelect["user"] = { select: userSelect };
   }
   return taskSelect;
 };
@@ -69,7 +69,7 @@ const index = async (req, res) => {
       priority: true,
       createdAt: true,
       userId: true, // bug
-      User: {
+      user: {
         select: {
           name: true,
           email: true,
@@ -129,7 +129,7 @@ const show = async (req, res) => {
       createdAt: true,
       priority: true,
       userId: true, // bug
-      User: {
+      user: {
         select: {
           name: true,
           email: true,
@@ -268,4 +268,4 @@ const bulkCreate = async (req, res) => {
   });
 };
 
-export default { index, show, create, bulkCreate, deleteTask, update };
+export { index, show, create, bulkCreate, deleteTask, update };
