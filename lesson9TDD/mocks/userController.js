@@ -1,7 +1,7 @@
 // eslint-disable-next-line n/no-missing-import -- created by student in this assignment
 import prisma from "../../db/prisma.js";
 // eslint-disable-next-line n/no-missing-import -- created by student in this assignment
-import { userSchema } from "../validation/userSchema.js";
+import userSchema from "../validation/userSchema.js";
 import { randomUUID } from "crypto";
 import jwt from "jsonwebtoken";
 
@@ -160,7 +160,7 @@ const show = async (req, res) => {
       name: true,
       email: true,
       createdAt: true,
-      Task: {
+      tasks: {
         where: { isCompleted: false },
         select: {
           id: true,
@@ -180,4 +180,4 @@ const show = async (req, res) => {
   res.status(200).json(user);
 };
 
-export default { register, logon, logoff, show };
+export { register, logon, logoff, show };

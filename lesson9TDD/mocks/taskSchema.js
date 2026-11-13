@@ -10,4 +10,4 @@ const patchTaskSchema = Joi.object({
   isCompleted: Joi.boolean().not(null),
 });
 
-export default { taskSchema, patchTaskSchema };
+export { taskSchema, patchTaskSchema };
