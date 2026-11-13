@@ -1,8 +1,21 @@
 import express from "express";
+import "./setenv.js";
+import cookieParser from "cookie-parser";
+import helmet from "helmet";
+import { xss } from "express-xss-sanitizer";
+import rateLimiter from "express-rate-limit";
 
 const app = express();
-
+app.use(
+  rateLimiter({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 100, // limit each IP to 100 requests per windowMs
+  }),
+);
 app.use(express.json());
+app.use(cookieParser());
+app.use(helmet());
+app.use(xss());
 
 // const timeRouter from "./routes/timeRoutes");
 
@@ -22,15 +35,16 @@ import prisma from "./db/prisma.js";
 
 // global.tasks = [];
 // global.users = [];
-global.user_id = null;
+// global.user_id = null;
 
-import authMiddleware from "./middleware/auth.js";
+// import authMiddleware from "./middleware/auth.js";
+import jwtMiddleware from "./middleware/jwtMiddleware.js";
 import taskRouter from "./routes/taskRoutes.js";
 
-app.use("/api/tasks", authMiddleware, taskRouter);
+app.use("/api/tasks", jwtMiddleware, taskRouter);
 import userRouter from "./routes/userRoutes.js";
 import anaRouter from "./routes/analyticsRoutes.js";
-app.use("/api/analytics", authMiddleware, anaRouter);
+app.use("/api/analytics", jwtMiddleware, anaRouter);
 import notFound from "./middleware/not-found.js";
 import errorHandler from "./middleware/error-handler.js";
 

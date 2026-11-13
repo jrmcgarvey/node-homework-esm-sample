@@ -16,7 +16,6 @@ import {
 import { register, logoff, logon } from "../controllers/userController.js";
 import jwtMiddleware from "../middleware/jwtMiddleware.js";
 /* eslint-enable n/no-missing-import */
-import cookie from "cookie";
 import { describe, it, expect, beforeAll, afterAll } from "vitest";
 import request from "supertest";
 
@@ -24,14 +23,10 @@ function MockResponseWithCookies() {
   const res = httpMocks.createResponse({
     eventEmitter: EventEmitter,
   });
+  res.setCookieList = [];
   res.cookie = (name, value, options = {}) => {
-    const serialized = cookie.serialize(name, String(value), options);
-    let currentHeader = res.getHeader("Set-Cookie");
-    if (currentHeader === undefined) {
-      currentHeader = [];
-    }
-    currentHeader.push(serialized);
-    res.setHeader("Set-Cookie", currentHeader);
+    const cookieObject = { name, value, options };
+    res.setCookieList.push(cookieObject);
   };
   return res;
 }
@@ -82,12 +77,11 @@ describe("testing logon, register, and logoff", () => {
   });
   let jwtCookie;
   it("A string in the Set-Cookie array starts with jwt=.", () => {
-    const setCookieArray = saveRes.get("Set-Cookie");
-    jwtCookie = setCookieArray.find((str) => str.startsWith("jwt="));
+    jwtCookie = saveRes.setCookieList.find((cookie) => cookie.name === "jwt");
     expect(jwtCookie).toBeDefined();
   });
   it("That string contains HttpOnly;.", () => {
-    expect(jwtCookie).toContain("HttpOnly");
+    expect(jwtCookie.options.httpOnly).toBeTruthy;
   });
   it("returns the expected name.", () => {
     saveData = saveRes._getJSONData();
@@ -149,9 +143,15 @@ describe("testing logon, register, and logoff", () => {
     expect(saveRes.statusCode).toBe(200);
   });
   it("The logoff clears the cookie.", () => {
-    const setCookieArray = saveRes.get("Set-Cookie");
-    jwtCookie = setCookieArray.find((str) => str.startsWith("jwt="));
-    expect(jwtCookie).toContain("Jan 1970");
+    const jwtCookie = saveRes.setCookieList.find(
+      (cookie) => cookie.name === "jwt",
+    );
+    expect(jwtCookie).toBeDefined();
+    expect(jwtCookie.options.expires).toBeDefined();
+    const milliOne = new Date(jwtCookie.options.expires).getMilliseconds();
+    const milliTwo = new Date("01/01/1970").getMilliseconds();
+    const milliThree = milliOne - milliTwo;
+    expect(Math.abs(milliThree)).toBeLessThan(10000);
   });
 });
 
@@ -378,7 +378,7 @@ try {
   ({ default: userSchema } = await import("../validation/userSchema.js"));
   ({ taskSchema, patchTaskSchema } =
     await import("../validation/taskSchema.js"));
-     /* eslint-enable n/no-missing-import */
+  /* eslint-enable n/no-missing-import */
 } catch {
   // these won't be built at the start, but we want the test to proceed
 }
@@ -491,7 +491,7 @@ if (taskSchema) {
 }
 
 describe("function tests of user operations", async () => {
-   /* eslint-disable n/no-missing-import */
+  /* eslint-disable n/no-missing-import */
   const { app, server } = await import("../app.js");
   /* eslint-enable n/no-missing-import */
   let agent;

@@ -3,20 +3,41 @@ import userSchema from "../validation/userSchema.js";
 import prisma from "../db/prisma.js";
 import crypto from "crypto";
 import util from "util";
-const scrypt = util.promisify(crypto.scrypt);
+import jwt from "jsonwebtoken";
+import { randomUUID, scrypt } from "crypto";
+const scryptAsync = util.promisify(scrypt);
+import { StatusCodes } from "http-status-codes";
 
 async function hashPassword(password) {
   const salt = crypto.randomBytes(16).toString("hex");
-  const derivedKey = await scrypt(password, salt, 64);
+  const derivedKey = await scryptAsync(password, salt, 64);
   return `${salt}:${derivedKey.toString("hex")}`;
 }
 
 async function comparePassword(inputPassword, storedHash) {
   const [salt, key] = storedHash.split(":");
   const keyBuffer = Buffer.from(key, "hex");
-  const derivedKey = await scrypt(inputPassword, salt, 64);
+  const derivedKey = await scryptAsync(inputPassword, salt, 64);
   return crypto.timingSafeEqual(keyBuffer, derivedKey);
 }
+
+const cookieFlags = (req) => {
+  return {
+    ...(process.env.NODE_ENV === "production" && { domain: req.hostname }), // add domain into cookie for production only
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
+  };
+};
+
+const setJwtCookie = (req, res, user) => {
+  // Sign JWT
+  const payload = { id: user.id, csrfToken: randomUUID() };
+  const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: "1h" }); // 1 hour expiration
+  // Set cookie.  Note that the cookie flags have to be different in production and in test.
+  res.cookie("jwt", token, { ...cookieFlags(req), maxAge: 3600000 }); // 1 hour expiration
+  return payload.csrfToken; // this is needed in the body returned by logon() or register()
+};
 
 const register = async (req, res) => {
   const { error, value } = userSchema.validate(req.body, {
@@ -70,7 +91,8 @@ const register = async (req, res) => {
     });
 
     // Store the user ID globally for session management (not secure for production)
-    global.user_id = result.user.id;
+    // global.user_id = result.user.id;
+    const csrfToken = setJwtCookie(req, res, result.user);
 
     // Send response with status 201
     res.status(201);
@@ -78,6 +100,7 @@ const register = async (req, res) => {
       user: result.user,
       welcomeTasks: result.welcomeTasks,
       transactionStatus: "success",
+      csrfToken,
     });
     return;
   } catch (err) {
@@ -98,13 +121,51 @@ const logon = async (req, res) => {
     return res.status(401).json({ message: "Logon failed" });
   }
 
-  global.user_id = user.id;
-  res.status(200).json({ name: user.name, email: user.email });
+  // global.user_id = user.id;
+  const csrfToken = setJwtCookie(req, res, user);
+  res.status(200).json({ name: user.name, email: user.email, csrfToken });
 };
 
-const logoff = async (_req, res) => {
-  global.user_id = null;
+const logoff = async (req, res) => {
+  // global.user_id = null;
+  res.clearCookie("jwt", cookieFlags(req));
   res.status(200).end();
 };
 
-export { register, logon, logoff };
+const show = async (req, res) => {
+  const userId = parseInt(req.params.id);
+
+  if (isNaN(userId)) {
+    return res
+      .status(StatusCodes.BAD_REQUEST)
+      .json({ error: "Invalid user ID" });
+  }
+
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      createdAt: true,
+      Task: {
+        where: { isCompleted: false },
+        select: {
+          id: true,
+          title: true,
+          priority: true,
+          createdAt: true,
+        },
+        orderBy: { createdAt: "desc" },
+        take: 5,
+      },
+    },
+  });
+  if (!user) {
+    return res.status(StatusCodes.NOT_FOUND).json({ error: "User not found" });
+  }
+
+  res.json(user);
+};
+
+export { register, logon, logoff, show };
