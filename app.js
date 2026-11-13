@@ -1,4 +1,5 @@
 import express from "express";
+import "./setenv.js"
 
 const app = express();
 
