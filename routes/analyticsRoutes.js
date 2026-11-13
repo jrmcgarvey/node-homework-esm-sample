@@ -1,5 +1,5 @@
 import express from "express";
-import anaController from "../controllers/analyticsController.js";
+import * as anaController from "../controllers/analyticsController.js";
 const router = express.Router();
 
 router.get("/users", anaController.getUsersWithStats);
