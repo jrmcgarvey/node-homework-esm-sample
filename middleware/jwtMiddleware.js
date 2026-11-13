@@ -15,7 +15,6 @@ export default async (req, res, next) => {
   jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
     // using the callback here.  Of course, we could promisify instead.
     if (err) {
-      console.log(err);
       return send401(res);
     }
     req.user = { id: decoded.id };
